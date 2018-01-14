@@ -1,0 +1,70 @@
+#!/bin/bash
+
+if [ $# -eq 0 ];then
+echo "no valid inputs"
+exit
+fi
+function valid_ip()
+{
+    local  ip=$1
+    local  stat=1
+
+    if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        OIFS=$IFS
+        IFS='.'
+        ip=($ip)
+        IFS=$OIFS
+        [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
+            && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+        stat=$?
+    fi
+    return $stat
+}
+
+checkempty() {
+
+if [ -z "$1" ]; then
+echo $2
+exit 0
+fi
+
+}
+
+case "$1" in
+
+	"-a"|"--add")
+		if [ -n "$2" ] && [ -n "$3" ]; then
+			if valid_ip $2; then
+					echo "$2 $3" >> /etc/hosts
+					echo "virtual hosts addedd successfully!"
+					exit
+			else
+					echo "not a valid ip (make sure ip is the first option value)"
+			fi
+		else
+		echo "option values are incomplete"
+		fi
+	;;
+	
+	"-r"|"--remove")
+		
+		checkempty $2 "option value is missing"
+		sed -i 's/'"$(grep $2 /etc/hosts)"'//g' /etc/hosts
+		echo "virtual host was removed!"
+        	exit
+	;;
+
+	"-h"|"--help")
+		echo -e "Usage: Adding: \n hostsctl -a <ip> <hostname> OR  hostsctl --add <ip> <hostname> \nRemoving hostsctl -r <ip> <hostname> OR hostsctl --remove <ip> <hostname>"
+
+	*)
+		echo "no options received / invalid option"
+		exit
+esac
+
+
+
+
+
+
+

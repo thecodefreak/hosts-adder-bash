@@ -9,19 +9,19 @@ copy the script to /usr/bin or /bin as you wish, so that it will be easy to use 
 
 ***To add an entry***
 
-> hostsctl -a mysite.in 127.0.0.1
+> hostsctl -a 127.0.0.1 mysite.in
 
 OR
 
-> hostsctl --add mysite.in 127.0.0.1
+> hostsctl --add 127.0.0.1 mysite.in
 
 ***To remove an entry***
 
-> hostsctl -r mysite.in 127.0.0.1
+> hostsctl -r mysite.in
 
 OR 
 
-> hostsctl --remove mysite.in 127.0.0.1
+> hostsctl --remove mysite.in
 
 ## For more info use help
 

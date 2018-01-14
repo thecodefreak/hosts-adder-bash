@@ -36,7 +36,7 @@ case "$1" in
 		if [ -n "$2" ] && [ -n "$3" ]; then
 			if valid_ip $2; then
 					echo "$2 $3" >> /etc/hosts
-					echo "virtual hosts addedd successfully!"
+					echo "host $2 addedd successfully!"
 					exit
 			else
 					echo "not a valid ip (make sure ip is the first option value)"
@@ -50,7 +50,7 @@ case "$1" in
 		
 		checkempty $2 "option value is missing"
 		sed -i 's/'"$(grep $2 /etc/hosts)"'//g' /etc/hosts
-		echo "virtual host was removed!"
+		echo "host $2 was removed!"
         	exit
 	;;
 

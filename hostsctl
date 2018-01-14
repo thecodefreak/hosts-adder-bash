@@ -55,16 +55,10 @@ case "$1" in
 	;;
 
 	"-h"|"--help")
-		echo -e "Usage: Adding: \n hostsctl -a <ip> <hostname> OR  hostsctl --add <ip> <hostname> \nRemoving hostsctl -r <ip> <hostname> OR hostsctl --remove <ip> <hostname>"
+		echo -e "Usage: \n\tAdding: \n\n hostsctl -a <ip> <hostname> OR  hostsctl --add <ip> <hostname> \n\n \tRemoving\n\n hostsctl -r <ip> <hostname> OR hostsctl --remove <ip> <hostname>"
+	;;
 
 	*)
 		echo "no options received / invalid option"
 		exit
 esac
-
-
-
-
-
-
-

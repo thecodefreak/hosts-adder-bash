@@ -36,7 +36,7 @@ case "$1" in
 		if [ -n "$2" ] && [ -n "$3" ]; then
 			if valid_ip $2; then
 					echo "$2 $3" >> /etc/hosts
-					echo "host $2 addedd successfully!"
+					echo "host $2 added successfully!"
 					exit
 			else
 					echo "not a valid ip (make sure ip is the first option value)"

@@ -42,7 +42,7 @@ hostsctl -ri <ip>
 
 ### Restore last change
 
-You know some times we regerts the things we do :laughing:
+You know sometimes we regert the things we do :laughing:
 
 ```bash
 hostsctl --restore

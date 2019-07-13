@@ -45,7 +45,7 @@ hostsctl -ri <ip>
 You know some times we regerts the things we do :laughing:
 
 ```bash
-hostsctl --restore <ip>
+hostsctl --restore
 ```
 
 # Have a suggestion ? 

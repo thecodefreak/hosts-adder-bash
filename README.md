@@ -1,36 +1,52 @@
-# hosts-adder-bash
+# HOSTS Adder (hostsctl) - Bash
 
-copy the script to /usr/bin or /bin as you wish, so that it will be easy to use it often
+## How to install
 
-***Using the hosts adder shell script is quite easy :)*** :relaxed:
+> run the installer.sh
+```bash
+chmod +x installer.sh
 
-**Here is a demo**
+./installer.sh
+```
+- OR
+```bash
+bash installer.sh
+```
 
+> You can also copy it to the /usr/bin directory and apply execute permission
 
-***To add an entry***
-
-> hostsctl -a 127.0.0.1 mysite.in
-
-OR
-
-> hostsctl --add 127.0.0.1 mysite.in
-
-***To remove an entry***
-
-> hostsctl -r mysite.in
-
-OR 
-
-> hostsctl --remove mysite.in
-
-## For more info use help
-
-> hostsctl --help  OR hostsctl -h
+```bash
+chmod +x hostsctl
+mv hostsctl /usr/bin
+```
 
 
-This is my first script and it is simple one.. :simple_smile:
+# How to use ?
 
-Hope it will be useful for someguys out there :D
+### Adding a host
+```bash
+hostsctl -a <ip> <hostname>
+```
 
 
+### Removing a host
+```bash
+hostsctl -rh <hostname>
+```
 
+
+### Removing an IP
+```bash
+hostsctl -ri <ip>
+```
+
+### Restore last change
+
+You know some times we regerts the things we do :laughing:
+
+```bash
+hostsctl --restore <ip>
+```
+
+# Have a suggestion ? 
+Alayws here to hear it :smile: [Contact Me](amaljohnronkha@protonmail.com)

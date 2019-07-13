@@ -1,13 +1,44 @@
 #!/bin/bash
 
-if [ $# -eq 0 ];then
-echo "no valid inputs"
-exit
+end='\033[0m'
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+blue='\033[0;34m'
+white='\033[0;37m'
+
+export hostf="/etc/hosts"
+
+pre=$1
+
+if [[ $UID -ne 0 ]] && ! [[ $pre =~ (-h|--help) ]]; then
+	echo -e "${red}Cannot run without super user privileges!${end}" && exit
 fi
-function valid_ip()
+
+if [[ ! -f $hostf ]] && [[ "$pre" != "--restore" ]]; then
+	echo -e "${red}hosts file not found!${end}" && exit
+fi
+
+bak_file=$HOME/.hostsctlbak
+
+if [[ "$pre" != "--restore" ]]; then
+	cp -f $hostf $bak_file
+fi
+
+if [[ $# -eq 0 ]];then
+	echo "no valid inputs"
+	exit
+fi
+
+opt=$1
+export ip="$2"
+export host="$3"
+
+
+valid_ip()
 {
-    local  ip=$1
-    local  stat=1
+    local ip=$1
+    local stat=1
 
     if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
         OIFS=$IFS
@@ -21,44 +52,150 @@ function valid_ip()
     return $stat
 }
 
-checkempty() {
 
-if [ -z "$1" ]; then
-echo $2
-exit 0
-fi
-
+add_hostto_ip() {
+	local ip=$1
+	local host=$2
+	if [[ $(grep -cw "$ip" $hostf) -eq 0 ]]; then
+		echo "$ip $host" >> $hostf
+		return 0
+	else
+		sed -i "s/$ip\b/$ip $host/" $hostf
+		return 0
+	fi
 }
 
-case "$1" in
+check_duplicate() {
+	local host=$1
+	dup_count=$(grep -cw "$host" $hostf)
+	if [[ $dup_count -gt 0 ]]; then
+		echo -e "${red} This hostname already exists in the hosts file! ${end}\n\n Use -fa option to add a host forcefully!"
+		exit
+	fi
+}
 
-	"-a"|"--add")
-		if [ -n "$2" ] && [ -n "$3" ]; then
-			if valid_ip $2; then
-					echo "$2 $3" >> /etc/hosts
-					echo "host $2 addedd successfully!"
-					exit
+remove_host() {
+	local ip=$1
+	line=$(grep -w "$ip" $hostf)
+	cip=$(echo $line | awk '{print $1}')
+	check=$(echo $line | sed -e "s/${ip}\b//" -e "s/$cip\s//g" | sed 's/\s//g')
+	if [[ "${check:0:1}" == '#'  ]] || [[ -z "$check" ]]; then
+		sed -i "/$ip\b/d" $hostf
+		return 0
+	else
+		sed -i "s/${ip}\b\s*//1" $hostf
+		return 1
+	fi
+}
+
+remove_ip() {	
+	local ip=$1
+	sed -i "/$ip\b/d" $hostf
+	return 0
+}
+
+force_addhost() {
+	local ip=$1
+	local host=$2
+	remove_host "$host"
+	add_hostto_ip "$ip" "$host"
+}
+
+wexit() {
+	sleep 1;exit
+}
+
+check_record() {
+	record=$1
+	if [[ $(grep -cw "$record" $hostf) -eq 0 ]]; then
+		echo -e "${yellow}No matching entries for $record!${end}"
+		wexit
+	fi
+}
+
+
+case "$opt" in
+	"-a"|"--add"|"-fa"|"--force-add")
+		if [[ -n "$ip" ]] && [[ -n "$host" ]]; then
+			if valid_ip $ip; then
+				if valid_ip "$host"; then
+					echo -e "${red}Host cannot be an ip address!${end}"
+					wexit
+				fi
+				if [[ "$opt" == "-fa" ]] || [[ "$opt" == "--force-add" ]]; then 
+					force_addhost "$ip" "$host"
+					echo -e "${green}Forcefully added host $host${end}"
+					wexit
+				fi
+				check_duplicate "$ip"
+				add_hostto_ip "$ip" "$host"
+				if [[ $? -eq 0 ]]; then 
+					echo -e "${green}host $host added successfully!${end}";
+				else
+					echo -e "${red}Failed to add the host $host!${end}";
+				fi 
 			else
-					echo "not a valid ip (make sure ip is the first option value)"
+				echo -e "${red}not a valid ip (make sure ip is the first option value)${end}"
 			fi
 		else
-		echo "option values are incomplete"
+			echo -e "${red}option values are incomplete${end}"
 		fi
 	;;
 	
-	"-r"|"--remove")
-		
-		checkempty $2 "option value is missing"
-		sed -i 's/'"$(grep $2 /etc/hosts)"'//g' /etc/hosts
-		echo "host $2 was removed!"
-        	exit
+	"-rh"|"--remove-host")
+		if [[ -z $ip ]]; then 
+			echo -e "${red}Host cannot be empty!${end}"; 
+			wexit
+		fi
+		if valid_ip "$ip"; then
+			echo -e "${red}Host name cannot be an IP!${end}"; 
+			wexit
+		fi
+		check_record "$ip"
+		remove_host "$ip"
+		echo -e "${green}host $ip was removed!${end}"
+		wexit
+	;;
+
+	"-ri"|"--remove-ip")
+	if [[ -z $ip ]]; then 
+		echo -e "${red}IP cannot be empty!${end}"; wexit
+	fi
+	check_record "$ip"
+	remove_ip "$ip"
+	echo -e "${green}IP $ip was removed!${end}"
+	wexit
+	;;
+
+	"--restore")
+	if [[ -f $bak_file ]]; then
+		cp -f $bak_file $hostf
+		echo -e "${green}Restored hosts file successfully!${end}"
+		wexit
+	fi
+	echo -e "${red}Backup file not found!${end}"
 	;;
 
 	"-h"|"--help")
-		echo -e "Usage: \n\tAdding: \n\n hostsctl -a <ip> <hostname> OR  hostsctl --add <ip> <hostname> \n\n \tRemoving\n\n hostsctl -r <ip> <hostname> OR hostsctl --remove <ip> <hostname>"
+echo -e "
+${blue}=======================${green}[[ USAGE ]]${blue}=======================${white}
+
+adding a host\t\t\t:	hostsctl -a <ip> <hostname>
+\t\t\t\t\thostsctl --add <ip> <hostname>
+-------\n
+adding host (forced)\t\t:	hostsctl -fa <ip> <hostname>
+\t\t\t\t\thostsctl --force-add <ip> <hostname>
+-------\n
+removing by host\t\t:	hostsctl -rh <hostname>
+\t\t\t\t\thostsctl --remove-host <hostname>
+-------\n
+removing by ip\t\t\t:	hostsctl -ri <ip>
+\t\t\t\t\thostsctl --remove-ip <ip>$
+-------\n
+restore last change\t\t:	hostsctl --restore${end}
+"
 	;;
 
 	*)
 		echo "no options received / invalid option"
-		exit
 esac

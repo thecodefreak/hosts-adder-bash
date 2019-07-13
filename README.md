@@ -49,4 +49,4 @@ hostsctl --restore
 ```
 
 # Have a suggestion ? 
-Always here to hear it :smile: [Contact Me](amaljohnronkha@protonmail.com)
+Always here to hear it :smile: [Contact Me](mailto:amaljohnronkha@protonmail.com)

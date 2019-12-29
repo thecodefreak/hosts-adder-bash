@@ -127,7 +127,7 @@ case "$opt" in
 					echo -e "${green}Forcefully added host $host${end}"
 					wexit
 				fi
-				check_duplicate "$ip"
+				check_duplicate "$host"
 				add_hostto_ip "$ip" "$host"
 				if [[ $? -eq 0 ]]; then 
 					echo -e "${green}host $host added successfully!${end}";

@@ -1,29 +1,32 @@
-# HOSTS Adder (hostsctl) - Bash
+# Linux Hosts Adder
 
-## How to install
+## Table of Contents
 
-> run the installer.sh
-```bash
-chmod +x installer.sh
+- [About](#about)
+- [Installing](#installing)
+- [Usage](#usage)
 
-./installer.sh
+## About <a name = "about"></a>
+
+A very simple tool to manage your hosts file
+
+## Installing <a name = "installing"></a>
+
+It's nothing to worry. Just execute the below command.
+
+```sh
+sudo install hostsctl /usr/local/bin
 ```
-- OR
-```bash
-bash installer.sh
-```
+*OR*
 
-> You can also copy it to the /usr/bin directory and apply execute permission
-
-```bash
+```sh
 chmod +x hostsctl
-mv hostsctl /usr/bin
+sudo cp hostsctl /usr/local/bin
 ```
 
+## Usage <a name = "usage"></a>
 
-# How to use ?
-
-### Adding a host
+ Adding a host
 ```bash
 hostsctl -a <ip> <hostname>
 ```
@@ -42,11 +45,8 @@ hostsctl -ri <ip>
 
 ### Restore last change
 
-You know sometimes we regert the things we do :laughing:
+You know sometimes we regert the things we do 🤭
 
 ```bash
 hostsctl --restore
 ```
-
-# Have a suggestion ? 
-Always here to hear it :smile: [Contact Me](mailto:amaljohnronkha@protonmail.com)
